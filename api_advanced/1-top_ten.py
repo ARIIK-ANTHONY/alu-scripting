@@ -3,12 +3,12 @@
 Reddit Top 10 Posts Fetcher
 
 This module defines a function `top_ten` that fetches and prints the titles of
-the first 10 hot posts for a given subreddit using the Reddit API.
+the first 10 hot posts for a given subreddit using Reddit's API.
 
 If the subreddit is invalid, it prints `None`.
 
-The function does not follow redirects, to avoid being redirected to search
-results for non-existent subreddits.
+The function does not follow redirects, ensuring it does not get redirected to
+search results for non-existent subreddits.
 
 Usage:
     top_ten('programming')
@@ -43,7 +43,7 @@ def top_ten(subreddit):
             url,
             headers=headers,
             params=params,
-            allow_redirects=False  # Important to prevent redirect to search page
+            allow_redirects=False  # Prevent following redirects
         )
 
         if response.status_code != 200:
@@ -62,3 +62,5 @@ def top_ten(subreddit):
 
     except Exception:
         print(None)
+
+    print("OK")
