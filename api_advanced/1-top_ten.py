@@ -3,15 +3,15 @@
 Reddit Top 10 Posts Fetcher
 
 This module defines a function `top_ten` that fetches and prints the titles of
-the top 10 hot posts for a given subreddit using Reddit's public API.
+the first 10 hot posts for a given subreddit using the Reddit API.
 
-If the subreddit does not exist or is inaccessible, the function prints `None`
-followed by `OK`.
+If the subreddit is invalid, it prints `None`.
+
+The function does not follow redirects, to avoid being redirected to search
+results for non-existent subreddits.
 
 Usage:
-    top_ten('python')
-
-This script is designed to be compatible with Python 3 and conforms to PEP8.
+    top_ten('programming')
 
 Author: Your Name
 """
@@ -23,39 +23,42 @@ def top_ten(subreddit):
     """
     Fetch and print the top 10 hot post titles for a given subreddit.
 
+    Args:
+        subreddit (str): The name of the subreddit to query.
+
     Prints:
         - Titles of the top 10 hot posts (one per line).
-        - If subreddit is invalid, prints `None`.
-        - Always ends with `OK`.
-
-    Args:
-        subreddit (str): The name of the subreddit.
+        - `None` if the subreddit is invalid or does not exist.
     """
     url = f"https://www.reddit.com/r/{subreddit}/hot.json"
-    headers = {'User-Agent': 'MyAPI/0.0.1'}
+    headers = {
+        'User-Agent': 'MyRedditAPI/1.0 (by ALU Student)'
+    }
+    params = {
+        'limit': 10
+    }
 
     try:
-        response = requests.get(url, headers=headers, allow_redirects=False)
+        response = requests.get(
+            url,
+            headers=headers,
+            params=params,
+            allow_redirects=False  # Important to prevent redirect to search page
+        )
 
         if response.status_code != 200:
             print(None)
-            print("OK")
             return
 
         data = response.json().get('data', {})
-        posts = data.get('children', [])
+        children = data.get('children', [])
 
-        count = 0
-        for post in posts:
-            if count >= 10:
-                break
-            print(post.get('data', {}).get('title'))
-            count += 1
-
-        if count == 0:
+        if not children:
             print(None)
+            return
 
-    except (requests.RequestException, ValueError, KeyError):
+        for post in children:
+            print(post.get('data', {}).get('title'))
+
+    except Exception:
         print(None)
-
-    print("OK")
